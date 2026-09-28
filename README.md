@@ -117,7 +117,7 @@ RSA (viết tắt của Rivest, Shamir, Adleman) là nền tảng của hệ m�
 
 ---
 
-### 2.1. Nguyên lý sinh cặp khóa (Key Generation)
+### Nguyên lý sinh cặp khóa (Key Generation)
 
 Tính bảo mật của thuật toán RSA dựa trên độ khó của bài toán phân tích một số nguyên cực lớn thành tích của hai số nguyên tố. Các bước sinh cặp khóa diễn ra như sau:
 
