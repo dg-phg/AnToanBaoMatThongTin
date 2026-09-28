@@ -5,56 +5,6 @@
 + **Lớp:** K235480106056
 + **Trường:** Đại học Kỹ thuật Công nghiệp Thái Nguyên
 ---
-## 1. Tìm hiểu thuật toán mã hóa hiện đại DES và AES
-
-### Thuật toán DES (Data Encryption Standard)
-- **Tổng quan:** DES là thuật toán mã hóa khối đối xứng được phát triển bởi IBM. Nó thao tác trên các khối dữ liệu có kích thước 64-bit và sử dụng một khóa 56-bit (thực chất khóa dài 64-bit nhưng 8 bit được dùng để kiểm tra chẵn lẻ).
-- **Quy trình mã hóa/giải mã:** 
-  - **Khởi tạo:** Khối bản rõ 64-bit ban đầu đi qua một phép hoán vị khởi tạo (Initial Permutation - IP).
-  - **16 vòng lặp Feistel:** Dữ liệu sau đó được chia làm 2 nửa (Trái - L, Phải - R) mỗi nửa 32-bit. Thuật toán sẽ trải qua 16 vòng biến đổi (Round). Trong mỗi vòng, nửa phải được mở rộng lên 48-bit, XOR với khóa con 48-bit của vòng đó, đi qua các hộp S-Box để nén lại thành 32-bit, qua hộp hoán vị P-Box, và cuối cùng XOR với nửa trái.
-  - **Kết thúc:** Sau 16 vòng, hai nửa được ghép lại và đi qua phép hoán vị nghịch đảo ($IP^{-1}$) để tạo ra bản mã (Ciphertext).
-  - **Giải mã:** Diễn ra hoàn toàn tương tự nhưng thứ tự sử dụng các khóa con bị đảo ngược (từ $K_{16}$ về $K_1$).
-
-### Thuật toán AES (Advanced Encryption Standard)
-- **Tổng quan:** AES là tiêu chuẩn mã hóa tiên tiến hơn, được thiết kế để thay thế DES (vốn đã bị phá vỡ bởi các cuộc tấn công Brute-force do độ dài khóa quá ngắn). AES mã hóa các khối dữ liệu 128-bit và hỗ trợ ba độ dài khóa: 128-bit (10 vòng), 192-bit (12 vòng), và 256-bit (14 vòng).
-- **Quy trình mã hóa:** Không sử dụng mạng Feistel như DES, AES sử dụng mạng thay thế-hoán vị (SPN - Substitution-Permutation Network) và thao tác trên một ma trận trạng thái (State matrix) $4 \times 4$. Mỗi vòng lặp của AES (ngoại trừ vòng cuối) bao gồm 4 bước chính:
-  1. **SubBytes:** Thay thế phi tuyến tính các byte dữ liệu sử dụng một bảng tra cứu (S-Box) cố định, giúp chống lại các cuộc tấn công phân tích.
-  2. **ShiftRows:** Dịch vòng các byte trên mỗi hàng của ma trận trạng thái, giúp xáo trộn dữ liệu.
-  3. **MixColumns:** Trộn tuyến tính các cột của ma trận (sử dụng phép nhân ma trận trên trường Galois GF($2^8$)), tạo ra hiệu ứng khuếch tán cao.
-  4. **AddRoundKey:** XOR ma trận trạng thái hiện tại với khóa con (Round Key) được sinh ra từ khóa chính.
-- **Giải mã:** Sử dụng các hàm ngược lại theo thứ tự ngược: Inverse ShiftRows, Inverse SubBytes, AddRoundKey, và Inverse MixColumns.
-- **Cài đặt:** Trong dự án này, AES được cài đặt bằng ngôn ngữ **Python** thông qua thư viện `pycryptodome` (sử dụng chế độ CBC với IV ngẫu nhiên) tại file `baitap1.py`.
-
----
-
-## 2. Tìm hiểu thuật toán mã hóa bất đối xứng RSA
-
-### Tổng quan
-RSA (Rivest–Shamir–Adleman) là hệ mật mã khóa bất đối xứng phổ biến nhất hiện nay. Nó dựa trên một tính chất toán học quan trọng: *Rất dễ để nhân hai số nguyên tố lớn với nhau, nhưng cực kỳ khó (mất thời gian phi thực tế) để phân tích tích của chúng ngược lại thành hai thừa số nguyên tố đó.*
-
-### Nguyên lý sinh cặp khóa (Bí mật & Công khai)
-Để tạo ra một cặp khóa RSA, quy trình gồm các bước sau:
-1. **Chọn số nguyên tố:** Chọn ngẫu nhiên 2 số nguyên tố rất lớn là $p$ và $q$.
-2. **Tính n:** Tính $n = p \times q$. Số $n$ này sẽ được dùng làm module cho cả khóa công khai và khóa bí mật.
-3. **Tính hàm số Euler $\phi(n)$:** $\phi(n) = (p - 1) \times (q - 1)$.
-4. **Chọn khóa công khai (e):** Chọn một số nguyên $e$ thỏa mãn 2 điều kiện: $1 < e < \phi(n)$ và $e$ nguyên tố cùng nhau với $\phi(n)$ (nghĩa là ƯCLN($e, \phi(n)$) = 1).
-5. **Tính khóa bí mật (d):** Tính $d$ là nghịch đảo modulo của $e$ theo modulo $\phi(n)$. Nghĩa là $(d \times e) \pmod{\phi(n)} = 1$.
-6. **Kết quả cặp khóa:**
-   - **Khóa công khai (Public Key - PU):** Bao gồm cặp số $(e, n)$. Khóa này được phân phối rộng rãi cho mọi người.
-   - **Khóa bí mật (Private Key - PR):** Bao gồm cặp số $(d, n)$. Khóa này phải được giữ kín tuyệt đối bởi chủ sở hữu.
-
----
-
-## 3. Các mô hình áp dụng RSA và Tối ưu hóa
-
-### Các mô hình áp dụng RSA
-Do có hai khóa (Public và Private) có thể mã hóa/giải mã chéo cho nhau, RSA được ứng dụng trong 3 mô hình chính:
-1. **Mô hình xác thực người nhận (Bảo mật thông điệp):**
-   - *Cách hoạt động:* Người gửi (A) sử dụng **Khóa công khai của người nhận (# BÁO CÁO MẬT MÃ HỌC CƠ BẢN: DES, AES VÀ RSA
-
-Tài liệu này trình bày chi tiết về các thuật toán mã hóa đối xứng (DES, AES), thuật toán bất đối xứng (RSA), cách ứng dụng, so sánh và mô hình kết hợp sức mạnh của chúng. 
-
----
 
 ## PHẦN 1: TÌM HIỂU THUẬT TOÁN MÃ HÓA HIỆN ĐẠI DES VÀ AES
 
@@ -95,55 +45,66 @@ AES được ra đời để thay thế DES, là tiêu chuẩn mã hóa được
 *   **Quy trình giải mã:** Áp dụng các hàm ngược: `InvShiftRows`, `InvSubBytes`, `InvMixColumns` và sử dụng các khóa con theo thứ tự ngược lại.
 
 ### 3. Cài đặt thuật toán AES (Sử dụng Python)
+Thuật toán (File baitap1.py)
 
-Dưới đây là mã nguồn Python sử dụng thư viện `pycryptodome` để mô phỏng quá trình mã hóa/giải mã AES với chế độ CBC (Cipher Block Chaining).
+Dưới đây là mã nguồn Python triển khai thuật toán mã hóa đối xứng AES (chế độ CBC) và mã hóa bất đối xứng RSA, kết hợp đo thời gian thực thi của cả hai thuật toán:
 
-```python
-# Yêu cầu cài đặt thư viện: pip install pycryptodome
+``` python
+import os
+import time
 from Crypto.Cipher import AES
+from Crypto.PublicKey import RSA
+from Crypto.Cipher import PKCS1_OAEP
 from Crypto.Util.Padding import pad, unpad
-from Crypto.Random import get_random_bytes
-import base64
 
-def aes_encrypt(plaintext, key):
-    # Khởi tạo vector iv ngẫu nhiên (16 bytes)
-    iv = get_random_bytes(AES.block_size)
+# 1. HAM MA HOA / GIAI MA AES
+def aes_encrypt(plaintext: str, key: bytes):
+    iv = os.urandom(16)
     cipher = AES.new(key, AES.MODE_CBC, iv)
-    
-    # Pad dữ liệu để chia hết cho block_size (16 bytes)
-    padded_data = pad(plaintext.encode('utf-8'), AES.block_size)
-    ciphertext = cipher.encrypt(padded_data)
-    
-    # Trả về chuỗi base64 của (IV + Ciphertext) để dễ lưu trữ
-    return base64.b64encode(iv + ciphertext).decode('utf-8')
+    ciphertext = cipher.encrypt(pad(plaintext.encode('utf-8'), AES.block_size))
+    return iv + ciphertext
 
-def aes_decrypt(encrypted_data_b64, key):
-    raw_data = base64.b64decode(encrypted_data_b64)
-    # Tách IV (16 bytes đầu) và Ciphertext (phần còn lại)
-    iv = raw_data[:AES.block_size]
-    ciphertext = raw_data[AES.block_size:]
-    
+def aes_decrypt(ciphertext_with_iv: bytes, key: bytes):
+    iv = ciphertext_with_iv[:16]
+    actual_ciphertext = ciphertext_with_iv[16:]
     cipher = AES.new(key, AES.MODE_CBC, iv)
-    padded_plaintext = cipher.decrypt(ciphertext)
-    
-    # Loại bỏ padding để lấy dữ liệu gốc
-    return unpad(padded_plaintext, AES.block_size).decode('utf-8')
+    decrypted_padded = cipher.decrypt(actual_ciphertext)
+    return unpad(decrypted_padded, AES.block_size).decode('utf-8')
 
+# 2. CHAY CHUONG TRINH BAI TAP
 if __name__ == "__main__":
-    # Khóa AES (16 bytes = 128 bits, hoặc dùng 32 bytes = 256 bits)
-    SECRET_KEY = b'16bytesecretkey!' 
+    message = "Bai tap An toan va bao mat thong tin"
     
-    message = "Đây là thông điệp bí mật cần bảo vệ."
-    print(f"[*] Original Message: {message}")
+    # AES
+    aes_key = os.urandom(32)
+    start_aes = time.time()
+    aes_cipher = aes_encrypt(message, aes_key)
+    aes_plain = aes_decrypt(aes_cipher, aes_key)
+    time_aes = time.time() - start_aes
     
-    # Mã hóa
-    encrypted_msg = aes_encrypt(message, SECRET_KEY)
-    print(f"[*] Encrypted (Base64): {encrypted_msg}")
+    print("--- MA HOA AES ---")
+    print("Ban ro:", message)
+    print("Ban ma:", aes_cipher.hex()[:40], "...")
+    print("Giai ma:", aes_plain)
+    print(f"Thoi gian AES: {time_aes:.6f} giay\n")
+
+    # RSA
+    key = RSA.generate(2048)
+    cipher_rsa = PKCS1_OAEP.new(key.publickey())
+    decrypt_rsa = PKCS1_OAEP.new(key)
     
-    # Giải mã
-    decrypted_msg = aes_decrypt(encrypted_msg, SECRET_KEY)
-    print(f"[*] Decrypted Message: {decrypted_msg}")
+    start_rsa = time.time()
+    rsa_cipher = cipher_rsa.encrypt(message.encode('utf-8'))
+    rsa_plain = decrypt_rsa.decrypt(rsa_cipher).decode('utf-8')
+    time_rsa = time.time() - start_rsa
+    
+    print("--- MA HOA RSA ---")
+    print("Ban ma RSA:", rsa_cipher.hex()[:40], "...")
+    print("Giai ma RSA:", rsa_plain)
+    print(f"Thoi gian RSA: {time_rsa:.6f} giay")
 ```
+
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/90649adf-8056-4033-b619-fda992f5c05f" />
 
 --- 
 
@@ -154,22 +115,31 @@ RSA (viết tắt của Rivest, Shamir, Adleman) là nền tảng của hệ m�
 *   **Khóa công khai (Public Key):** Được chia sẻ công khai cho tất cả mọi người, dùng để mã hóa dữ liệu hoặc kiểm chứng chữ ký.
 *   **Khóa bí mật (Private Key):** Phải được người sở hữu giữ an toàn tuyệt đối, dùng để giải mã dữ liệu hoặc tạo chữ ký số.
 
-*[Chèn Ảnh: HÌNH 1 - Minh họa khái niệm Ổ khóa (Public Key) và Chìa khóa (Private Key) trong hệ thống bất đối xứng]*
+---
 
-### Nguyên lý sinh cặp khóa (Key Generation)
+### 2.1. Nguyên lý sinh cặp khóa (Key Generation)
+
 Tính bảo mật của thuật toán RSA dựa trên độ khó của bài toán phân tích một số nguyên cực lớn thành tích của hai số nguyên tố. Các bước sinh cặp khóa diễn ra như sau:
 
-1.  **Chọn số nguyên tố:** Chọn ngẫu nhiên 2 số nguyên tố độc lập và có giá trị rất lớn là $p$ và $q$.
-2.  **Tính Modulus ($n$):** Tính $n = p \times q$. Giá trị $n$ này sẽ được sử dụng làm module cho cả Khóa công khai và Khóa bí mật. (Độ dài tính bằng bit của $n$ chính là độ dài khóa RSA, phổ biến hiện nay là 2048-bit hoặc 4096-bit).
-3.  **Tính hàm số phi Euler ($\phi(n)$):** Tính $\phi(n) = (p - 1) \times (q - 1)$.
-4.  **Chọn số mũ công khai ($e$):** Chọn một số nguyên $e$ thỏa mãn hai điều kiện: $1 < e < \phi(n)$ và $e$ nguyên tố cùng nhau với $\phi(n)$ (tức là $UCLN(e, \phi(n)) = 1$). Số $e$ thường được chọn là 65537 để tăng tốc độ mã hóa.
-5.  **Tính số mũ bí mật ($d$):** Tính $d$ là nghịch đảo modulo của $e$ theo module $\phi(n)$. Công thức: $(d \times e) \pmod{\phi(n)} = 1$.
+1. **Chọn số nguyên tố:** Chọn ngẫu nhiên 2 số nguyên tố độc lập và có giá trị rất lớn là $p$ và $q$.
+2. **Tính Modulus ($n$):** Tính $n = p \times q$. Giá trị $n$ này được dùng làm module cho cả Khóa công khai và Khóa bí mật (độ dài bit của $n$ phổ biến hiện nay là 2048-bit hoặc 4096-bit).
+3. **Tính hàm số phi Euler ($\phi(n)$):** Tính $\phi(n) = (p - 1) \times (q - 1)$.
+4. **Chọn số mũ công khai ($e$):** Chọn một số nguyên $e$ thỏa mãn hai điều kiện: $1 < e < \phi(n)$ và $\text{UCLN}(e, \phi(n)) = 1$. Số $e$ thường chọn là $65537$.
+5. **Tính số mũ bí mật ($d$):** Tính $d$ là nghịch đảo modulo của $e$ theo module $\phi(n)$, thỏa mãn: $(d \times e) \pmod{\phi(n)} = 1$.
 
 **Kết quả cặp khóa thu được:**
-*   **Khóa công khai (PU):** Bao gồm cặp số $(e, n)$.
-*   **Khóa bí mật (PR):** Bao gồm cặp số $(d, n)$.
+*   **Khóa công khai (Public Key - PU):** Bao gồm cặp số $(e, n)$.
+*   **Khóa bí mật (Private Key - PR):** Bao gồm cặp số $(d, n)$.
 
-*[Chèn Ảnh: HÌNH 2 - Sơ đồ các bước toán học sinh khóa RSA (Từ p, q tính ra n, $\phi(n)$, e và d)]*
+> **SƠ ĐỒ TÓM TẮT SINH KHÓA RSA:**
+> 
+> $$p, q \xrightarrow{\text{Nhân}} n = p \times q \xrightarrow{\text{Euler}} \phi(n) = (p-1)(q-1)$$
+> $$\downarrow$$
+> $$\text{Chọn } e \text{ thỏa mãn } \text{UCLN}(e, \phi(n))=1 \xrightarrow{\text{Modulo nghịch đảo}} d \cdot e \equiv 1 \pmod{\phi(n)}$$
+> $$\downarrow$$
+> $$\text{Public Key: } (e, n) \quad \vert{} \quad \text{Private Key: } (d, n)$$
+
+
 
 ---
 
@@ -184,9 +154,7 @@ Do cấu trúc có hai khóa hoạt động chéo (khóa này mã hóa thì khó
 *   **Mô hình 2: Xác thực người gửi (Chữ ký số - Digital Signature)**
     *   *Mục đích:* Đảm bảo tính toàn vẹn của dữ liệu và chống chối bỏ (người nhận biết chắc chắn ai đã gửi).
     *   *Quy trình:* Người gửi tạo mã băm (Hash) của tài liệu, sau đó dùng **Khóa bí mật của Người gửi** để ký (mã hóa) mã băm đó. Người nhận sử dụng **Khóa công khai của Người gửi** để giải mã đối chiếu mã băm, từ đó xác minh nguồn gốc.
-    
-    *[Chèn Ảnh: HÌNH 3 - Sơ đồ quy trình tạo và xác minh Chữ ký số (Digital Signature) bằng RSA]*
-
+  
 *   **Mô hình 3: Kết hợp xác thực cả hai**
     *   *Quy trình:* Người gửi ký lên tài liệu bằng **Khóa bí mật của mình**, sau đó mã hóa toàn bộ bằng **Khóa công khai của người nhận**. Mô hình này đảm bảo cả tính bảo mật tuyệt đối lẫn tính xác thực nguồn gốc.
 
@@ -207,5 +175,7 @@ Do cấu trúc có hai khóa hoạt động chéo (khóa này mã hóa thì khó
 2.  **Mã hóa Khóa (Bằng RSA):** Dùng **Khóa công khai RSA** của người nhận để mã hóa chính cái "Khóa phiên AES" vừa sinh ra.
 3.  **Truyền tải:** Gửi cả [Dữ liệu đã mã hóa bằng AES] và [Khóa AES đã mã hóa bằng RSA] qua mạng.
 4.  **Giải mã:** Người nhận dùng **Khóa bí mật RSA** của mình để mở ra "Khóa phiên AES". Sau đó dùng "Khóa phiên AES" này để giải mã khối dữ liệu lớn.
+   
+<img width="1408" height="768" alt="ma_hoa_ket_hop" src="https://github.com/user-attachments/assets/e7e5977a-2fab-4d3b-a77f-55c52f268187" />
 
-*[Chèn Ảnh: HÌNH 4 - Sơ đồ quy trình Hệ thống mã hóa kết hợp Hybrid Encryption (Dùng AES bọc dữ liệu, dùng RSA bọc khóa AES)]*
+*HÌNH: Sơ đồ quy trình Hệ thống mã hóa kết hợp Hybrid Encryption*
